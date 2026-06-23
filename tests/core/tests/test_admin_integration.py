@@ -8,8 +8,6 @@ from unittest.mock import MagicMock, patch
 import chardet
 import django
 import tablib
-from core.admin import AuthorAdmin, BookAdmin, CustomBookAdmin, ImportMixin
-from core.models import Author, Book, Category, EBook, Parent
 from django.contrib.admin.models import DELETION, LogEntry
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
@@ -20,6 +18,8 @@ from django.utils.translation import gettext_lazy as _
 from openpyxl.reader.excel import load_workbook
 from tablib import Dataset
 
+from core.admin import AuthorAdmin, BookAdmin, CustomBookAdmin, ImportMixin
+from core.models import Author, Book, Category, EBook, Parent
 from import_export import formats
 from import_export.admin import (
     ExportActionMixin,
@@ -680,7 +680,9 @@ class ExportAdminIntegrationTest(AdminTestMixin, TestCase):
             "file_format": "0",
         }
         date_str = datetime.now().strftime("%Y-%m-%d")
-        with self.assertNumQueries(7):  # Should not contain COUNT queries from ModelAdmin.get_results()
+        with self.assertNumQueries(
+            7
+        ):  # Should not contain COUNT queries from ModelAdmin.get_results()
             response = self.client.post("/admin/core/book/export/", data)
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.has_header("Content-Disposition"))
@@ -1493,7 +1495,7 @@ class TestImportSkipConfirm(AdminTestMixin, TransactionTestCase):
             follow=True,
             encoding="utf-8-sig",
             regex_in_response=(
-                ".*UnicodeDecodeError.* encountered " "while trying to read file"
+                ".*UnicodeDecodeError.* encountered while trying to read file"
             ),
         )
 
